@@ -1,11 +1,11 @@
 const { validationResult } = require('express-validator');
 
 const db = require('../models');
-const JournalCategory = db.JournalCategory;
+const Journal = db.Journal;
 
 // ------------ Create Record --------------------------------------
 exports.createRecord = async (req, res, next) => {
-    const {title,content} = req.body;
+    const {title,content, categoryId, isPublished, mood, reminder} = req.body;
     const userId = req.auth.userId;
   
     const errors = validationResult(req)
@@ -13,22 +13,26 @@ exports.createRecord = async (req, res, next) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    let journalCat_exists = await JournalCategory.findOne({
+    let journal_exists = await Journal.findOne({
       where: {
         title
       }
     });
 
-    if (journalCat_exists) {
-        return res.status(400).json({ code: -1, message: 'JournalCategory with provided title  exists' });
+    if (journal_exists) {
+        return res.status(400).json({ code: -1, message: 'Journal with provided title  exists' });
     }
 
 
   
-    const newJournalCat = new JournalCategory({
+    const newJournalCat = new Journal({
         title,
         content,
         userId,
+        categoryId,
+        isPublished,
+        mood,
+        reminder
         });
 
     try {
@@ -49,7 +53,7 @@ exports.createRecord = async (req, res, next) => {
 
 // ------------ Read Records --------------------------------------
 exports.fetchRecords = async (req, res) => {
-  let data = await JournalCategory.findAll();
+  let data = await Journal.findAll();
   console.log(data);
   res.status(200).send({
     message: data,
@@ -60,7 +64,7 @@ exports.fetchRecords = async (req, res) => {
 exports.fetchRecord = async (req, res) => {
   const id = req.params.id;
   try {
-    let record = await JournalCategory.findByPk(id);
+    let record = await Journal.findByPk(id);
     res.status(200).send(record);
   } catch (err) {
     res.status(500).send({
@@ -77,7 +81,7 @@ exports.updateRecord = async (req, res) => {};
 exports.deleteRecord = async (req, res) => {
   const id = req.params.id;
   try {
-    let del_record = await JournalCategory.destroy({
+    let del_record = await Journal.destroy({
       where: {
         id: id,
       },

@@ -18,6 +18,7 @@ require("./routes/Test")(app);
 require("./routes/User")(app);
 require("./routes/Auth")(app);
 require("./routes/JournalCategory")(app);
+require("./routes/Journal")(app);
 
 db.sequelize.sync().then((req) => {
   app.listen(process.env.APP_PORT, () => {
