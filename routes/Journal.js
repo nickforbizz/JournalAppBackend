@@ -2,7 +2,7 @@ module.exports = (app) => {
   var router = require('express').Router();
 
   const journal = require('../controllers/JournalController');
-  const {PostValidator} = require('../middleware/validators/journals')
+  const {PostValidator, UpdateValidator} = require('../middleware/validators/journals')
   const jwtCheckWithCustomErrorHandling = require('../middleware/auth/authenticate')
 
   // const jwtCheck = require('../middleware/auth/authenticate');
@@ -17,7 +17,7 @@ module.exports = (app) => {
   router.get('/:id', journal.fetchRecord);
 
   // Update a journal with id
-  router.put('/:id', jwtCheckWithCustomErrorHandling, journal.updateRecord);  
+  router.put('/:id', jwtCheckWithCustomErrorHandling, UpdateValidator, journal.updateRecord);  
 
   // Delete a journal with id
   router.delete('/:id', jwtCheckWithCustomErrorHandling, journal.deleteRecord);
