@@ -1,25 +1,26 @@
 module.exports = (app) => {
-  const { expressjwt: jwt } = require('express-jwt');
+  var router = require('express').Router();
+
   const journal = require('../controllers/JournalController');
   const {PostValidator} = require('../middleware/validators/journals')
-  var router = require('express').Router();
-  const jwtCheck = jwt({ secret: process.env.APP_SECRET_TOKEN, algorithms: ["HS256"]});
+  const jwtCheckWithCustomErrorHandling = require('../middleware/auth/authenticate')
+
   // const jwtCheck = require('../middleware/auth/authenticate');
 
   //  Create a new journal
-  router.post('/', jwtCheck, PostValidator, journal.createRecord);
+  router.post('/', jwtCheckWithCustomErrorHandling, PostValidator, journal.createRecord);
 
   // Retrieve all journal data
-  router.get('/', jwtCheck, journal.fetchRecords);
+  router.get('/', journal.fetchRecords);
 
   // Retrieve journal data
-  router.get('/:id', jwtCheck, journal.fetchRecord);
+  router.get('/:id', journal.fetchRecord);
 
   // Update a journal with id
-  router.put('/:id', jwtCheck, journal.updateRecord);
+  router.put('/:id', jwtCheckWithCustomErrorHandling, journal.updateRecord);  
 
   // Delete a journal with id
-  router.delete('/:id', jwtCheck, journal.deleteRecord);
+  router.delete('/:id', jwtCheckWithCustomErrorHandling, journal.deleteRecord);
 
 
   app.use('/api/journals', router);
